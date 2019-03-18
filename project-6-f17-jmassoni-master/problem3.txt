@@ -1,0 +1,73 @@
+.global main
+.global recurse
+.extern printf
+
+.data
+format : .asciz "%d \n"
+
+.text
+
+
+//this is my recursive function
+recurse:
+
+        push {ip, lr}
+	
+	//this if loop compares moves r0 into r1 and compares it to the number 1
+        reif:
+
+                mov r1, r0
+                cmp r1, #1
+
+                bgt reelse
+		
+		//this increments the number that is in r4
+                add r4, r4, #1
+                b done
+
+	//this accounts for the cases where the value in r1 isn't equal to 1
+        reelse:
+		
+		//first I square the value in r1 and store it in r5
+		//next I add that to value to the value in r4
+		//next I decrement the value in r1 and store it in r0
+		//finally we restart the recursion
+                mul r5, r1, r1
+                add r4, r4, r5
+                sub r0, r1, #1
+                bl recurse
+
+	//this moves the value calculated above from r5 into r0 and ends the
+	//recursive function
+        done:
+	
+                mov r0, r5
+
+        pop {ip, pc}
+
+
+
+
+
+main:
+
+        push {ip, lr}
+	
+	//the two numbers passed into r0 and r4 represent the beginning
+	//and end of the ziggurat construction, in terms of levels
+        mov r0, #10
+        mov r4, #0
+
+	//the registers above are passed into the recursive function
+        bl recurse
+	
+        mov r1, r4
+
+	//the final answer pushed out by the recursive function is
+	//printed here
+        ldr r0, =format
+        bl printf
+
+        pop {ip, pc}
+
+

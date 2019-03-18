@@ -1,0 +1,147 @@
+.global main
+.global mod
+.extern printf
+
+.data
+format : .asciz "%d\n"
+Fizz : .asciz "Fizz\n"
+Buzz : .asciz "Buzz\n"
+FizzBuzz : .asciz "FizzBuzz\n"
+
+.text
+
+mod:
+
+        push {ip, lr}
+	
+	//this is a while loop that calculates the mod of two numbers
+        while:
+		
+		//here we compare the numbers passed into r0 and r1
+                cmp r0, r1
+		
+		//we branch to endwhile if r0 is less than r1
+                blt endwhile
+
+		//otherwise we subtract r1 from r1 and restart the loop
+                sub r0, r0, r1
+		b while
+	
+	//endwhile pops the mod answer into r0
+        endwhile:
+
+        pop {ip, pc}
+
+main:
+
+        push {ip, lr}
+	
+	//r4 is holding our starting condition (1)
+        mov r4, #1
+	
+	//this while loop is used to count up from 1 through 100
+        while2:
+		
+		//this is used to continue the while loop if it's less than 100
+                cmp r4, #100
+
+		//if r4 is not less than 100 we jump down to endwhile2
+                bgt endwhile2
+
+		
+		//this is used to pass in the incremented number
+		//and the number 3 to the mod function
+                mov r0, r4
+                mov r1, #3
+                bl mod
+		
+		
+		//this if loop checks to see if the mod output is 0
+		//when modded with 3
+                if:
+		
+                        cmp r0, #0
+
+                        bne elseif
+
+                
+			//this nest if checks mods the incremented number
+			//and the number 5
+		        if2:
+                                mov r0, r4
+                                mov r1, #5
+                                bl mod
+
+                                cmp r0, #0
+				
+                                bne else2
+				
+				//this loads the fizzbuzz string into r0
+				//and prints it if the incremented number 
+				//outputs 0 when modded with 3 and 5
+                                ldr r0, =FizzBuzz
+                                bl printf
+                                b done
+
+			
+			//this else is used to account for an incremented number
+			//that, when modded with 3, is 0 but is not zero when
+			//modded with 5. This prints fizz	
+                        else2:
+
+                                ldr r0, =Fizz
+                                bl printf
+                                b done
+
+
+		//this else if statement accounts for an incremented number in r4
+		//equaling 0 when modded with 5 but not equaling 0 when
+		//modded with 3
+                elseif:
+
+			//we pass in the incremented number and the number 5
+			//to our mod function
+                        mov r0, r4
+                        mov r1, #5
+                        bl mod
+
+                        cmp r0, #0
+
+                        bne else
+
+                        
+			//if the incremented number mod 5 is equal to zero then
+			//buzz should be printed
+			ldr r0, =Buzz
+                        bl printf
+                        b done
+
+		
+		//this else accounts for an incremented number that doesn't return
+		//zero when modded with 3 and/or 5. It prints the number itself
+                else:
+
+                        mov r1, r4
+                        ldr r0, =format
+                        bl printf
+                        b done
+
+
+	//this label is used to increment the number and continue the while loop
+        done:
+
+                add r4, r4, #1
+
+                b while2
+
+	//endwhile2 is used to end the while loop
+        endwhile2:
+
+
+        pop {ip, pc}
+
+
+
+
+
+

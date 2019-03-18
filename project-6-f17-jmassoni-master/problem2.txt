@@ -1,0 +1,60 @@
+.global main
+.extern printf
+
+.data
+star : .asciz "*"
+newline : .asciz "\n"
+
+.text
+
+
+
+main:
+
+        push {ip, lr}
+	
+	//this is used to represent the first row of the triangle
+        mov r4, #0
+
+	//this for loop is used to keep the number of rows in the triangle
+	//under 5
+        for:
+                cmp r4, #5
+                bge done
+
+                //this is used to represent the number of asterisks in
+		//each row which should be equal to the row number
+		//(where zero is effectively equal to 1)
+		mov r5, #0
+		
+
+                for2:
+
+                        cmp r5, r4
+                        bgt done2
+			
+			//this is where we print our asterisk
+                        ldr r0, =star
+                        bl printf
+			
+			//this increments the number of asterisks
+			//and loops until it matches the number of 
+			//row that it's on
+                        add r5, r5, #1
+                        b for2
+		
+		//this is used to print a line break in between rows
+                done2:
+	
+                        ldr r0, =newline
+                        bl printf
+		
+		//this is used to increment the row number and restart
+		//the outer for loop
+                add r4, r4, #1
+                b for
+
+	//this used to end the outer for loop
+        done:
+
+        pop {ip, pc}
